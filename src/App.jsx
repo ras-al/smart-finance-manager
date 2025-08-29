@@ -19,13 +19,22 @@ export default function App() {
     const [streaks, setStreaks] = useState({ noJunkFood: 0, noImpulseSpending: 0 });
     const [authDetails, setAuthDetails] = useState({ email: '', password: '' });
     const [isLoginView, setIsLoginView] = useState(true);
-    const [aiAlert, setAiAlert] = useState(''); // State for proactive health alerts
+    const [aiAlert, setAiAlert] = useState('');
+    const [theme, setTheme] = useState('light'); // 'light' or 'dark'
 
     const defaultProfile = { junkFoodLimit: 2000, impulseSpendingLimit: 10000, savingsGoal: 5000 };
 
+    // --- Theme Toggling Effect ---
+    useEffect(() => {
+        document.body.className = theme + '-theme';
+    }, [theme]);
+
+    const toggleTheme = () => {
+        setTheme(prevTheme => (prevTheme === 'light' ? 'dark' : 'light'));
+    };
+
     // --- Gemini API Call Helper ---
     const callGeminiAPI = useCallback(async (prompt) => {
-        // MODIFIED: Read the API key from environment variables
         const apiKey = import.meta.env.VITE_GEMINI_API_KEY;
         const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=${apiKey}`;
         try {
@@ -96,23 +105,16 @@ export default function App() {
         if (transactions.length > 0) {
             const oneWeekAgo = new Date();
             oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
-
-            const junkFoodLastWeek = transactions.filter(t =>
-                t.foodTag === 'Junk' && new Date(t.date) > oneWeekAgo
-            );
-
-            // Alert if junk food is eaten more than twice a week
+            const junkFoodLastWeek = transactions.filter(t => t.foodTag === 'Junk' && new Date(t.date) > oneWeekAgo);
             if (junkFoodLastWeek.length > 2) {
                 const generateAlert = async () => {
                     const prompt = `A user has eaten junk food ${junkFoodLastWeek.length} times in the last 7 days. Write a gentle, non-judgmental alert (2-3 sentences) encouraging them to consider healthier options for their next meal. Mention that moderation is key to a healthy lifestyle.`;
                     const alertText = await callGeminiAPI(prompt);
-                    if (alertText) {
-                        setAiAlert(alertText);
-                    }
+                    if (alertText) setAiAlert(alertText);
                 };
                 generateAlert();
             } else {
-                setAiAlert(''); // Clear alert if the condition is not met
+                setAiAlert('');
             }
         }
     }, [transactions, callGeminiAPI]);
@@ -253,6 +255,9 @@ export default function App() {
                     <button onClick={() => setView('settings')} className={view === 'settings' ? 'active' : ''}>Settings</button>
                 </nav>
                 <div className="sidebar-footer">
+                    <button onClick={toggleTheme} className="theme-toggle">
+                        {theme === 'light' ? '🌙' : '☀️'}
+                    </button>
                     <div className="user-profile">
                         <span>{user.displayName || user.email}</span>
                     </div>
