@@ -181,3 +181,37 @@ body { background-color: var(--background-color); color: var(--text-color); over
     .fab { bottom: 80px; right: 15px; }
 }
 
+@media (max-width: 768px) {
+    .app-container { flex-direction: column-reverse; }
+    .main-content { padding: 15px; }
+    .sidebar { order: 2; }
+    .sidebar-header, .user-profile, .logout-btn, .theme-toggle { display: none; }
+    .sidebar-nav { width: 100%; justify-content: space-around; }
+    .sidebar-nav button { flex-grow: 1; text-align: center; font-size: 14px; padding: 8px 10px; }
+    .content-grid { grid-template-columns: 1fr; }
+    .fab { bottom: 80px; right: 15px; }
+}
+@media (max-width: 768px) {
+    .app-container { flex-direction: column-reverse; }
+    .main-content { padding: 15px; }
+    .sidebar { order: 2; }
+
+    /* Keep these hidden */
+    .sidebar-header, .user-profile, .logout-btn { display: none; }
+
+    /* Keep theme toggle visible & move to top-right */
+    .theme-toggle { 
+        display: flex; 
+        position: absolute; 
+        top: 10px; 
+        right: 10px; 
+        width: 36px; 
+        height: 36px; 
+        font-size: 1.2rem; 
+    }
+
+    .sidebar-nav { width: 100%; justify-content: space-around; }
+    .sidebar-nav button { flex-grow: 1; text-align: center; font-size: 14px; padding: 8px 10px; }
+    .content-grid { grid-template-columns: 1fr; }
+    .fab { bottom: 80px; right: 15px; }
+}
