@@ -2,7 +2,7 @@ import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import { auth, db } from './firebase'; // Import from your firebase.js file
 import { onAuthStateChanged, createUserWithEmailAndPassword, signInWithEmailAndPassword } from 'firebase/auth';
 import { collection, addDoc, onSnapshot, query, where, doc, setDoc } from 'firebase/firestore';
-import { DashboardView, AddTransactionView, AnalyticsView, GoalsView, ReportsView, SettingsView } from './components/Views'; // Import views from components/Views.jsx
+import { DashboardView, AddTransactionView, AnalyticsView, GoalsView, ReportsView, SettingsView, ComparisonView } from './components/Views'; // Import views from components/Views.jsx
 import './styles.css'; // Import your CSS file
 
 // --- Main App Component ---
@@ -202,7 +202,20 @@ export default function App() {
         const categorySpending = thisMonthTransactions.reduce((acc, t) => { acc[t.category] = (acc[t.category] || 0) + t.amount; return acc; }, {});
         const pieData = Object.keys(categorySpending).map(key => ({ name: key, value: categorySpending[key] }));
         const unnecessarySpending = impulseSpending;
-        return { totalSpent, junkFoodSpending, impulseSpending, totalCalories, pieData, unnecessarySpending, thisMonthTransactions };
+        
+        const dailySpending = thisMonthTransactions.reduce((acc, t) => {
+            const day = new Date(t.date).getDate();
+            acc[day] = (acc[day] || 0) + t.amount;
+            return acc;
+        }, {});
+
+        const daysInMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0).getDate();
+        const monthlyGraphData = Array.from({ length: daysInMonth }, (_, i) => ({
+            day: i + 1,
+            spent: dailySpending[i + 1] || 0,
+        }));
+
+        return { totalSpent, junkFoodSpending, impulseSpending, totalCalories, pieData, unnecessarySpending, thisMonthTransactions, monthlyGraphData };
     }, [transactions]);
     
     // --- Render Logic ---
@@ -238,6 +251,7 @@ export default function App() {
             case 'goals': return <GoalsView analysis={analysis} userProfile={userProfile} streaks={streaks} />;
             case 'reports': return <ReportsView analysis={analysis} callGeminiAPI={callGeminiAPI} />;
             case 'settings': return <SettingsView user={user} userProfile={userProfile} showNotification={showNotification} />;
+            case 'comparison': return <ComparisonView allTransactions={transactions} callGeminiAPI={callGeminiAPI} />;
             default: return <DashboardView analysis={analysis} userProfile={userProfile} streaks={streaks} transactions={transactions} callGeminiAPI={callGeminiAPI} aiAlert={aiAlert} />;
         }
     };
@@ -245,15 +259,16 @@ export default function App() {
     return (
         <div className="app-container">
             {notification.show && <div className={`notification ${notification.type}`}>{notification.message}</div>}
-            <aside className="sidebar">
+            <nav className="sidebar">
                 <div className="sidebar-header"><h2>Smart AI</h2></div>
-                <nav className="sidebar-nav">
+                <div className="sidebar-nav">
                     <button onClick={() => setView('dashboard')} className={view === 'dashboard' ? 'active' : ''}>Dashboard</button>
                     <button onClick={() => setView('analytics')} className={view === 'analytics' ? 'active' : ''}>Analytics</button>
+                    <button onClick={() => setView('comparison')} className={view === 'comparison' ? 'active' : ''}>Comparison</button>
                     <button onClick={() => setView('goals')} className={view === 'goals' ? 'active' : ''}>Goals</button>
                     <button onClick={() => setView('reports')} className={view === 'reports' ? 'active' : ''}>Reports</button>
                     <button onClick={() => setView('settings')} className={view === 'settings' ? 'active' : ''}>Settings</button>
-                </nav>
+                </div>
                 <div className="sidebar-footer">
                     <button onClick={toggleTheme} className="theme-toggle">
                         {theme === 'light' ? '🌙' : '☀️'}
@@ -263,9 +278,10 @@ export default function App() {
                     </div>
                      <button onClick={() => auth.signOut()} className="logout-btn">Logout</button>
                 </div>
-            </aside>
+            </nav>
             <main className="main-content">{renderView()}</main>
             <button className="fab" onClick={() => setView('add')}>+</button>
         </div>
     );
 }
+

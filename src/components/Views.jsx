@@ -1,10 +1,10 @@
 import React, { useState, useMemo, useEffect } from 'react';
-import { PieChart, Pie, Cell, Tooltip, Legend, ResponsiveContainer, LineChart, Line, CartesianGrid, XAxis, YAxis } from 'recharts';
+import { PieChart, Pie, Cell, Tooltip, Legend, ResponsiveContainer, LineChart, Line, CartesianGrid, XAxis, YAxis, BarChart, Bar } from 'recharts';
 import { db } from '../firebase';
 import { doc, setDoc } from 'firebase/firestore';
 
 export function DashboardView({ analysis, userProfile, streaks, transactions, callGeminiAPI, aiAlert }) {
-    const { totalSpent, junkFoodSpending, impulseSpending, unnecessarySpending } = analysis;
+    const { totalSpent, junkFoodSpending, impulseSpending, unnecessarySpending, monthlyGraphData } = analysis;
     const [coachAdvice, setCoachAdvice] = useState('');
     const [isCoachLoading, setIsCoachLoading] = useState(true);
 
@@ -55,6 +55,22 @@ export function DashboardView({ analysis, userProfile, streaks, transactions, ca
                 <div className="kpi-card"><h3>Junk Food Spending</h3><p>₹{junkFoodSpending.toFixed(2)}</p><span className={`kpi-subtext ${junkFoodSpending > userProfile.junkFoodLimit ? 'danger' : 'safe'}`}>Limit: ₹{userProfile.junkFoodLimit}</span></div>
                 <div className="kpi-card"><h3>Impulse Purchases</h3><p>₹{impulseSpending.toFixed(2)}</p><span className={`kpi-subtext ${impulseSpending > userProfile.impulseSpendingLimit ? 'danger' : 'safe'}`}>Limit: ₹{userProfile.impulseSpendingLimit}</span></div>
             </div>
+
+            <div className="card full-width">
+                <h3>Monthly Expense Flow</h3>
+                <div className="monthly-graph-container">
+                    <ResponsiveContainer width="100%" height="100%">
+                         <LineChart data={monthlyGraphData} margin={{ top: 5, right: 20, left: -10, bottom: 5 }}>
+                            <XAxis dataKey="day" />
+                            <YAxis />
+                            <CartesianGrid strokeDasharray="3 3" />
+                            <Tooltip formatter={(value) => `₹${value.toFixed(2)}`} />
+                            <Line type="monotone" dataKey="spent" stroke="var(--primary-color)" strokeWidth={2} activeDot={{ r: 8 }} />
+                        </LineChart>
+                    </ResponsiveContainer>
+                </div>
+            </div>
+
             <div className="content-grid">
                 <div className="card"><h3>AI Savings Coach</h3>
                     <div className="ai-feature-box">
@@ -250,3 +266,89 @@ export function SettingsView({ user, userProfile, showNotification }) {
         </div>
     );
 }
+
+export function ComparisonView({ allTransactions, callGeminiAPI }) {
+    const [period1, setPeriod1] = useState(new Date().toISOString().slice(0, 7));
+    const [period2, setPeriod2] = useState(new Date(new Date().setMonth(new Date().getMonth() - 1)).toISOString().slice(0, 7));
+    const [comparisonData, setComparisonData] = useState(null);
+    const [isLoading, setIsLoading] = useState(false);
+    const [aiSummary, setAiSummary] = useState('');
+
+    const handleCompare = async () => {
+        setIsLoading(true);
+        setAiSummary('');
+
+        const analyzePeriod = (period) => {
+            const transactions = allTransactions.filter(t => t.date.startsWith(period));
+            const totalSpent = transactions.reduce((acc, t) => acc + t.amount, 0);
+            const junkFoodSpending = transactions.filter(t => t.foodTag === 'Junk').reduce((acc, t) => acc + t.amount, 0);
+            const impulseSpending = transactions.filter(t => t.isImpulse).reduce((acc, t) => acc + t.amount, 0);
+            return { totalSpent, junkFoodSpending, impulseSpending };
+        };
+
+        const data1 = analyzePeriod(period1);
+        const data2 = analyzePeriod(period2);
+
+        const chartData = [
+            { name: 'Total Spent', [period1]: data1.totalSpent, [period2]: data2.totalSpent },
+            { name: 'Junk Food', [period1]: data1.junkFoodSpending, [period2]: data2.junkFoodSpending },
+            { name: 'Impulse Buys', [period1]: data1.impulseSpending, [period2]: data2.impulseSpending },
+        ];
+        setComparisonData(chartData);
+
+        const prompt = `Compare the user's spending between two months. Period 1 (${period1}): ${JSON.stringify(data1)}. Period 2 (${period2}): ${JSON.stringify(data2)}. Provide a short, insightful summary of their financial changes. Highlight any improvements or areas where spending increased.`;
+        const summary = await callGeminiAPI(prompt);
+        if (summary) {
+            setAiSummary(summary);
+        }
+        setIsLoading(false);
+    };
+
+    return (
+        <div className="comparison-view">
+            <h1>Spending Comparison</h1>
+            <p>Compare your spending habits between different months.</p>
+            <div className="card comparison-form">
+                <div className="form-group">
+                    <label>Period 1</label>
+                    <input type="month" value={period1} onChange={e => setPeriod1(e.target.value)} />
+                </div>
+                <div className="form-group">
+                    <label>Period 2</label>
+                    <input type="month" value={period2} onChange={e => setPeriod2(e.target.value)} />
+                </div>
+                <button onClick={handleCompare} disabled={isLoading} className="submit-btn">
+                    {isLoading ? 'Analyzing...' : 'Compare'}
+                </button>
+            </div>
+
+            {isLoading && <p>Loading comparison...</p>}
+
+            {comparisonData && !isLoading && (
+                <div className="content-grid">
+                    <div className="card">
+                        <h3>Comparison Chart</h3>
+                        <ResponsiveContainer width="100%" height={300}>
+                            <BarChart data={comparisonData}>
+                                <CartesianGrid strokeDasharray="3 3" />
+                                <XAxis dataKey="name" />
+                                <YAxis />
+                                <Tooltip />
+                                <Legend />
+                                <Bar dataKey={period1} fill="#8884d8" />
+                                <Bar dataKey={period2} fill="#82ca9d" />
+                            </BarChart>
+                        </ResponsiveContainer>
+                    </div>
+                    <div className="card">
+                        <h3>AI Analysis</h3>
+                        <div className="ai-feature-box">
+                            {aiSummary ? <div className="ai-result"><p>{aiSummary}</p></div> : <p>AI summary will appear here.</p>}
+                        </div>
+                    </div>
+                </div>
+            )}
+        </div>
+    );
+}
+
