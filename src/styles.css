@@ -9,7 +9,7 @@
     --text-light: #777;
     --border-color: #e0e0e0;
     --shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
-    --success-color: #2ecc71; /* Can be adjusted to fit the teal scheme if desired */
+    --success-color: #2ecc71;
     --warning-color: #f39c12;
     --danger-color: #e74c3c;
 }
@@ -160,7 +160,7 @@ body { background-color: var(--background-color); color: var(--text-color); over
 .app-container { display: flex; flex-direction: column; height: 100vh; }
 .main-content { flex: 1; padding: 30px; overflow-y: auto; }
 
-/* --- Navbar (was Sidebar) --- */
+/* --- Sidebar (Desktop/Tablet) --- */
 .sidebar {
     width: 100%;
     background: var(--card-background);
@@ -183,11 +183,11 @@ body { background-color: var(--background-color); color: var(--text-color); over
 .sidebar-header h2 {
     font-size: 24px;
     font-weight: 700;
-    background: linear-gradient(90deg, var(--primary-color), var(--accent-light-color), var(--primary-color)); /* Deep teal to light teal gradient */
-    background-size: 200% auto; /* Make the gradient wider than the text */
+    background: linear-gradient(90deg, var(--primary-color), var(--accent-light-color), var(--primary-color));
+    background-size: 200% auto;
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
-    animation: text-wave 3s linear infinite; /* Apply the wave animation */
+    animation: text-wave 3s linear infinite;
 }
 
 .sidebar-header .logo {
