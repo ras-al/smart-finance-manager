@@ -1,9 +1,9 @@
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
-import { auth, db } from './firebase'; // Import from your firebase.js file
+import { auth, db } from './firebase';
 import { onAuthStateChanged, createUserWithEmailAndPassword, signInWithEmailAndPassword } from 'firebase/auth';
 import { collection, addDoc, onSnapshot, query, where, doc, setDoc } from 'firebase/firestore';
-import { DashboardView, AddTransactionView, AnalyticsView, GoalsView, ReportsView, SettingsView, ComparisonView } from './components/Views'; // Import views from components/Views.jsx
-import './styles.css'; // Import your CSS file
+import { DashboardView, AddTransactionView, AnalyticsView, GoalsView, ReportsView, SettingsView, ComparisonView } from './components/Views';
+import './styles.css';
 
 // --- Main App Component ---
 export default function App() {
@@ -26,11 +26,30 @@ export default function App() {
 
     // --- Theme Toggling Effect ---
     useEffect(() => {
-        document.body.className = theme + '-theme';
-    }, [theme]);
+        // Check for system preference on component mount
+        const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+        setTheme(prefersDark ? 'dark' : 'light');
+        document.body.className = prefersDark ? 'dark-theme' : 'light-theme';
+
+        // Add a listener to update the theme if the system preference changes
+        const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+        const handler = (e) => {
+            const newTheme = e.matches ? 'dark' : 'light';
+            setTheme(newTheme);
+            document.body.className = newTheme + '-theme';
+        };
+        mediaQuery.addEventListener('change', handler);
+
+        // Clean up the event listener
+        return () => mediaQuery.removeEventListener('change', handler);
+    }, []); // Empty dependency array means this runs only on mount and unmount
 
     const toggleTheme = () => {
-        setTheme(prevTheme => (prevTheme === 'light' ? 'dark' : 'light'));
+        setTheme(prevTheme => {
+            const newTheme = prevTheme === 'light' ? 'dark' : 'light';
+            document.body.className = newTheme + '-theme';
+            return newTheme;
+        });
     };
 
     // --- Gemini API Call Helper ---
@@ -92,13 +111,39 @@ export default function App() {
             const q = query(collection(db, "transactions"), where("userId", "==", user.uid));
             const unsubscribe = onSnapshot(q, (querySnapshot) => {
                 const transactionsData = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-                transactionsData.sort((a, b) => new Date(b.date) - new Date(a.date));
+                transactionsData.sort((a, b) => new Date(b.date) - new Date(b.date));
                 setTransactions(transactionsData);
-                updateStreaks(transactionsData);
             });
             return () => unsubscribe();
         }
     }, [user]);
+
+    // --- Streak Calculation Effect ---
+    // This effect now only calculates local streaks based on the transaction data.
+    // Writing to Firestore is now decoupled to prevent unnecessary database writes.
+    useEffect(() => {
+        if (transactions.length > 0 && user) {
+            const updateStreaks = () => {
+                const today = new Date(); today.setHours(0, 0, 0, 0);
+                let junkStreak = 0, impulseStreak = 0, lastJunkDate = null, lastImpulseDate = null;
+                const sorted = [...transactions].sort((a, b) => new Date(a.date) - new Date(b.date));
+                for (const t of sorted) {
+                    const tDate = new Date(t.date); tDate.setHours(0, 0, 0, 0);
+                    if (t.foodTag === 'Junk') lastJunkDate = tDate;
+                    if (t.isImpulse) lastImpulseDate = tDate;
+                }
+                if (lastJunkDate) junkStreak = Math.floor((today - lastJunkDate) / (1000 * 60 * 60 * 24));
+                else junkStreak = Math.floor((today - new Date(sorted[0].date)) / (1000 * 60 * 60 * 24));
+                if (lastImpulseDate) impulseStreak = Math.floor((today - lastImpulseDate) / (1000 * 60 * 60 * 24));
+                else impulseStreak = Math.floor((today - new Date(sorted[0].date)) / (1000 * 60 * 60 * 24));
+                const newStreaks = { noJunkFood: Math.max(0, junkStreak), noImpulseSpending: Math.max(0, impulseStreak) };
+                setStreaks(newStreaks);
+                // To further optimize, Firestore write could be triggered on app close/logout instead of every transaction update.
+                // setDoc(doc(db, "users", user.uid), { streaks: newStreaks }, { merge: true });
+            };
+            updateStreaks();
+        }
+    }, [transactions, user]);
 
     // --- AI Health Alert Effect ---
     useEffect(() => {
@@ -170,26 +215,6 @@ export default function App() {
         setNewItem({ name: '', amount: '', date: new Date().toISOString().split('T')[0] });
         setView('dashboard');
     };
-
-    // --- Streak Calculation ---
-    const updateStreaks = useCallback((currentTransactions) => {
-        if (currentTransactions.length === 0) return;
-        const today = new Date(); today.setHours(0, 0, 0, 0);
-        let junkStreak = 0, impulseStreak = 0, lastJunkDate = null, lastImpulseDate = null;
-        const sorted = [...currentTransactions].sort((a, b) => new Date(a.date) - new Date(b.date));
-        for (const t of sorted) {
-            const tDate = new Date(t.date); tDate.setHours(0, 0, 0, 0);
-            if (t.foodTag === 'Junk') lastJunkDate = tDate;
-            if (t.isImpulse) lastImpulseDate = tDate;
-        }
-        if (lastJunkDate) junkStreak = Math.floor((today - lastJunkDate) / (1000 * 60 * 60 * 24));
-        else junkStreak = Math.floor((today - new Date(sorted[0].date)) / (1000 * 60 * 60 * 24));
-        if (lastImpulseDate) impulseStreak = Math.floor((today - lastImpulseDate) / (1000 * 60 * 60 * 24));
-        else impulseStreak = Math.floor((today - new Date(sorted[0].date)) / (1000 * 60 * 60 * 24));
-        const newStreaks = { noJunkFood: Math.max(0, junkStreak), noImpulseSpending: Math.max(0, impulseStreak) };
-        setStreaks(newStreaks);
-        if (user) setDoc(doc(db, "users", user.uid), { streaks: newStreaks }, { merge: true });
-    }, [user]);
     
     // --- Data Analysis ---
     const analysis = useMemo(() => {
@@ -260,7 +285,10 @@ export default function App() {
         <div className="app-container">
             {notification.show && <div className={`notification ${notification.type}`}>{notification.message}</div>}
             <nav className="sidebar">
-                <div className="sidebar-header"><h2>Smart AI</h2></div>
+                <div className="sidebar-header">
+                    <img src="/vite.svg" alt="Smart AI Logo" className="logo" />
+                    <h2>Smart AI</h2>
+                </div>
                 <div className="sidebar-nav">
                     <button onClick={() => setView('dashboard')} className={view === 'dashboard' ? 'active' : ''}>Dashboard</button>
                     <button onClick={() => setView('analytics')} className={view === 'analytics' ? 'active' : ''}>Analytics</button>
@@ -284,4 +312,3 @@ export default function App() {
         </div>
     );
 }
-
