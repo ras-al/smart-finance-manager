@@ -1,21 +1,25 @@
 /* --- Root Variables for Theming (Light Theme) --- */
 :root {
-    --primary-color: #6a11cb;
-    --secondary-color: #2575fc;
-    --background-color: #f4f7fd;
+    --primary-color: #002B36; /* Deep dark teal */
+    --secondary-color: #14655B; /* Vibrant emerald green */
+    --accent-light-color: #A7FFEB; /* Light, minty teal */
+    --background-color: #f4f7fd; /* Keeping a light background for general app UI */
     --card-background: #ffffff;
     --text-color: #333;
     --text-light: #777;
     --border-color: #e0e0e0;
     --shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
-    --success-color: #2ecc71;
+    --success-color: #2ecc71; /* Can be adjusted to fit the teal scheme if desired */
     --warning-color: #f39c12;
     --danger-color: #e74c3c;
 }
 
 /* --- Dark Theme Variables --- */
 body.dark-theme {
-    --background-color: #121212;
+    --primary-color: #002B36; /* Stays the deep dark teal */
+    --secondary-color: #14655B; /* Stays the vibrant emerald green */
+    --accent-light-color: #A7FFEB; /* Stays the light minty teal */
+    --background-color: #121212; /* Dark background for dark theme */
     --card-background: #1e1e1e;
     --text-color: #e0e0e0;
     --text-light: #a0a0a0;
@@ -37,31 +41,120 @@ body.dark-theme {
 
 @keyframes pulse {
     0% {
-        box-shadow: 0 0 0 0 rgba(243, 156, 18, 0.4);
+        box-shadow: 0 0 0 0 rgba(20, 101, 91, 0.4); /* Using the secondary color for pulse */
     }
     70% {
-        box-shadow: 0 0 0 10px rgba(243, 156, 18, 0);
+        box-shadow: 0 0 0 10px rgba(20, 101, 91, 0);
     }
     100% {
-        box-shadow: 0 0 0 0 rgba(243, 156, 18, 0);
+        box-shadow: 0 0 0 0 rgba(20, 101, 91, 0);
     }
+}
+
+/* Continuous wave gradient animation for background */
+@keyframes continuous-wave {
+    0% { background-position: 0% 50%; }
+    100% { background-position: 100% 50%; }
+}
+
+/* New pulsing glow animation for the floating action button */
+@keyframes fab-glow {
+    0% {
+        box-shadow: 0 0 0 0 rgba(20, 101, 91, 0.7); /* Using the secondary color for glow */
+    }
+    70% {
+        box-shadow: 0 0 0 15px rgba(20, 101, 91, 0);
+    }
+    100% {
+        box-shadow: 0 0 0 0 rgba(20, 101, 91, 0);
+    }
+}
+
+/* Wave-like gradient animation for text */
+@keyframes text-wave {
+    0% { background-position: 100% 0; }
+    100% { background-position: 0% 0; }
 }
 
 
 * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', 'Segoe UI', 'Roboto', 'Helvetica Neue', sans-serif; }
 body { background-color: var(--background-color); color: var(--text-color); overflow-x: hidden; transition: background-color 0.3s, color 0.3s; }
 #root { height: 100vh; width: 100vw; }
-.loading-screen, .login-container { display: flex; align-items: center; justify-content: center; height: 100vh; width: 100vw; background: linear-gradient(135deg, var(--primary-color), var(--secondary-color)); color: white; text-align: center; }
-.login-box { background: rgba(255, 255, 255, 0.1); padding: 40px; border-radius: 20px; backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.2); width: 90%; max-width: 400px; }
-.login-box h1 { margin-bottom: 10px; }
-.login-box p { margin-bottom: 20px; opacity: 0.8; }
+
+/* The loading and login screens now use a professional, emerald gradient */
+.loading-screen, .login-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+    width: 100vw;
+    background: linear-gradient(135deg, #002B36, #14655B); /* Deep to vibrant teal */
+    background-size: 400% 400%;
+    animation: continuous-wave 15s ease infinite;
+    color: white;
+    text-align: center;
+}
+
+.login-box {
+    background: rgba(255, 255, 255, 0.15); /* Semi-transparent white card */
+    padding: 40px;
+    border-radius: 20px;
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.25);
+    width: 90%;
+    max-width: 400px;
+    animation: fadeIn 0.5s ease-out;
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.3);
+}
+.login-box h1 { margin-bottom: 10px; font-size: 2.2em; font-weight: 700; color: var(--accent-light-color); } /* Light teal heading */
+.login-box p { margin-bottom: 20px; opacity: 0.9; font-size: 1.1em; color: var(--accent-light-color); } /* Light teal text */
 .auth-form { display: flex; flex-direction: column; gap: 15px; }
-.auth-form input { background: rgba(255,255,255,0.2); border: 1px solid rgba(255,255,255,0.3); padding: 12px; border-radius: 8px; color: white; font-size: 16px; }
+.auth-form input {
+    background: rgba(255,255,255,0.25);
+    border: 1px solid rgba(255,255,255,0.4);
+    padding: 14px;
+    border-radius: 10px;
+    color: white;
+    font-size: 16px;
+    transition: background-color 0.3s, border-color 0.3s;
+}
 .auth-form input::placeholder { color: rgba(255,255,255,0.7); }
-.auth-form button { background: white; color: var(--primary-color); border: none; padding: 12px; border-radius: 8px; font-weight: 600; cursor: pointer; transition: background 0.2s; }
-.auth-form button:hover { background: #f0f0f0; }
-.auth-toggle { margin-top: 20px; font-size: 14px; }
-.auth-toggle button { background: none; border: none; color: white; text-decoration: underline; cursor: pointer; font-size: 14px; margin-left: 5px; }
+.auth-form input:focus {
+    background: rgba(255, 255, 255, 0.35);
+    border-color: rgba(255, 255, 255, 0.6);
+    outline: none;
+}
+
+.auth-form button {
+    background: var(--accent-light-color); /* Light teal button */
+    color: var(--primary-color); /* Deep dark teal text on button */
+    border: none;
+    padding: 15px;
+    border-radius: 10px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+.auth-form button:hover {
+    background: #8de8d8; /* Slightly darker light teal on hover */
+    transform: translateY(-3px) scale(1.01);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+}
+.auth-toggle { margin-top: 25px; font-size: 15px; }
+.auth-toggle button {
+    background: none;
+    border: none;
+    color: var(--accent-light-color);
+    text-decoration: underline;
+    cursor: pointer;
+    font-size: 15px;
+    margin-left: 5px;
+    transition: color 0.2s;
+}
+.auth-toggle button:hover {
+    color: #ccffee; /* Even lighter teal on hover */
+}
+
 
 /* --- App Layout --- */
 .app-container { display: flex; flex-direction: column; height: 100vh; }
@@ -79,11 +172,36 @@ body { background-color: var(--background-color); color: var(--text-color); over
     padding: 10px 20px;
     transition: background-color 0.3s, border-color 0.3s;
 }
-.sidebar-header h2 { background: linear-gradient(135deg, var(--primary-color), var(--secondary-color)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; font-size: 24px; }
+
+.sidebar-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+/* Animated "Smart AI" text */
+.sidebar-header h2 {
+    font-size: 24px;
+    font-weight: 700;
+    background: linear-gradient(90deg, var(--primary-color), var(--accent-light-color), var(--primary-color)); /* Deep teal to light teal gradient */
+    background-size: 200% auto; /* Make the gradient wider than the text */
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    animation: text-wave 3s linear infinite; /* Apply the wave animation */
+}
+
+.sidebar-header .logo {
+    width: 32px;
+    height: 32px;
+}
 .sidebar-nav { display: flex; flex-direction: row; gap: 10px; }
 .sidebar-nav button { background: none; border: none; text-align: left; padding: 12px 15px; border-radius: 8px; cursor: pointer; font-size: 16px; color: var(--text-light); transition: all 0.2s ease; }
 .sidebar-nav button:hover { background-color: var(--background-color); color: var(--text-color); }
-.sidebar-nav button.active { background: linear-gradient(90deg, var(--primary-color), var(--secondary-color)); color: white; font-weight: 600; }
+.sidebar-nav button.active {
+    background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
+    color: white;
+    font-weight: 600;
+}
 .sidebar-footer { display: flex; align-items: center; gap: 15px; }
 .user-profile { display: flex; align-items: center; justify-content: center; gap: 10px; padding: 10px; border-radius: 8px; background-color: var(--background-color); }
 .logout-btn { width: auto; margin-top: 0; padding: 10px; border: 1px solid var(--border-color); background: transparent; color: var(--text-light); border-radius: 8px; cursor: pointer; transition: all 0.2s ease; }
@@ -140,14 +258,33 @@ body { background-color: var(--background-color); color: var(--text-color); over
 .streak .streak-icon { font-size: 24px; } .streak p { font-size: 20px; font-weight: 600; margin: 5px 0; } .streak span { font-size: 14px; color: var(--text-light); }
 .badges-container h4 { font-size: 14px; color: var(--text-light); margin-bottom: 10px; border-top: 1px solid var(--border-color); padding-top: 15px; }
 .badge { display: inline-block; background: var(--background-color); padding: 5px 10px; border-radius: 15px; font-size: 12px; margin-right: 5px; margin-bottom: 5px; }
+.tag.junk { background-color: #fde2e2; color: var(--danger-color); } .tag.healthy { background-color: #e2fdef; color: var(--success-color); } .tag.impulse { background-color: #fef3e2; color: var(--warning-color); }
 .transaction-list { list-style: none; }
 .transaction-item { display: flex; align-items: center; padding: 15px 0; border-bottom: 1px solid var(--border-color); }
 .transaction-item:last-child { border-bottom: none; }
 .transaction-details { flex-grow: 1; } .transaction-details strong { display: block; } .transaction-details span { font-size: 12px; color: var(--text-light); }
 .transaction-tags .tag { font-size: 11px; padding: 3px 8px; border-radius: 10px; background-color: var(--background-color); margin: 0 2px; }
-.tag.junk { background-color: #fde2e2; color: #e74c3c; } .tag.healthy { background-color: #e2fdef; color: #2ecc71; } .tag.impulse { background-color: #fef3e2; color: #f39c12; }
 .transaction-amount { font-weight: 600; font-size: 16px; }
-.fab { position: fixed; bottom: 30px; right: 30px; width: 60px; height: 60px; border-radius: 50%; background: linear-gradient(135deg, var(--primary-color), var(--secondary-color)); color: white; border: none; font-size: 32px; display: flex; align-items: center; justify-content: center; box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2); cursor: pointer; transition: transform 0.2s ease; }
+/* Applying the new glow animation to the home button */
+.fab {
+    position: fixed;
+    bottom: 30px;
+    right: 30px;
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+    color: white;
+    border: none;
+    font-size: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
+    cursor: pointer;
+    transition: transform 0.2s ease;
+    animation: fab-glow 2s infinite;
+}
 .fab:hover { transform: scale(1.1); }
 .add-transaction-view, .analytics-view, .goals-view, .reports-view, .settings-view, .comparison-view { max-width: 800px; margin: 0 auto; }
 .add-transaction-view h1, .analytics-view h1, .goals-view h1, .reports-view h1, .settings-view h1, .comparison-view h1 { margin-bottom: 10px; }
@@ -169,37 +306,11 @@ body { background-color: var(--background-color); color: var(--text-color); over
 .challenge-item { display: flex; align-items: center; gap: 15px; padding: 15px; border-radius: 10px; margin-bottom: 10px; background-color: var(--background-color); }
 .challenge-item.completed { background-color: #e2fdef; border: 1px solid var(--success-color); }
 .challenge-icon { font-size: 24px; } .challenge-details { flex-grow: 1; } .challenge-details p { font-size: 12px; color: var(--text-light); margin: 0; } .challenge-status { font-size: 24px; }
-
 @media (max-width: 768px) {
     .app-container { flex-direction: column-reverse; }
     .main-content { padding: 15px; }
     .sidebar { order: 2; }
-    .sidebar-header, .user-profile, .logout-btn, .theme-toggle { display: none; }
-    .sidebar-nav { width: 100%; justify-content: space-around; }
-    .sidebar-nav button { flex-grow: 1; text-align: center; font-size: 14px; padding: 8px 10px; }
-    .content-grid { grid-template-columns: 1fr; }
-    .fab { bottom: 80px; right: 15px; }
-}
-
-@media (max-width: 768px) {
-    .app-container { flex-direction: column-reverse; }
-    .main-content { padding: 15px; }
-    .sidebar { order: 2; }
-    .sidebar-header, .user-profile, .logout-btn, .theme-toggle { display: none; }
-    .sidebar-nav { width: 100%; justify-content: space-around; }
-    .sidebar-nav button { flex-grow: 1; text-align: center; font-size: 14px; padding: 8px 10px; }
-    .content-grid { grid-template-columns: 1fr; }
-    .fab { bottom: 80px; right: 15px; }
-}
-@media (max-width: 768px) {
-    .app-container { flex-direction: column-reverse; }
-    .main-content { padding: 15px; }
-    .sidebar { order: 2; }
-
-    /* Keep these hidden */
     .sidebar-header, .user-profile, .logout-btn { display: none; }
-
-    /* Keep theme toggle visible & move to top-right */
     .theme-toggle { 
         display: flex; 
         position: absolute; 
@@ -209,7 +320,6 @@ body { background-color: var(--background-color); color: var(--text-color); over
         height: 36px; 
         font-size: 1.2rem; 
     }
-
     .sidebar-nav { width: 100%; justify-content: space-around; }
     .sidebar-nav button { flex-grow: 1; text-align: center; font-size: 14px; padding: 8px 10px; }
     .content-grid { grid-template-columns: 1fr; }

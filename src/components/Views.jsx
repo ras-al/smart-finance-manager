@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useEffect } from 'react';
+import React, { useState, useMemo, useEffect, useCallback } from 'react';
 import { PieChart, Pie, Cell, Tooltip, Legend, ResponsiveContainer, LineChart, Line, CartesianGrid, XAxis, YAxis, BarChart, Bar } from 'recharts';
 import { db } from '../firebase';
 import { doc, setDoc } from 'firebase/firestore';
@@ -8,27 +8,27 @@ export function DashboardView({ analysis, userProfile, streaks, transactions, ca
     const [coachAdvice, setCoachAdvice] = useState('');
     const [isCoachLoading, setIsCoachLoading] = useState(true);
 
-    useEffect(() => {
-        const getAICoachAdvice = async () => {
-            setIsCoachLoading(true);
-            const recentTransactions = transactions.slice(0, 10).map(t => `${t.name}: ₹${t.amount}`).join(', ');
-            if (transactions.length === 0) {
-                 setCoachAdvice("Add your first transaction to get personalized savings tips!");
-                 setIsCoachLoading(false);
-                 return;
-            }
-            const prompt = `Based on these recent transactions [${recentTransactions}], act as a friendly financial coach. Provide 3 specific, actionable tips to help the user save money. Format the response as a single string with each tip on a new line, starting with a bullet point (e.g., "• Tip 1...\\n• Tip 2...").`;
-            const advice = await callGeminiAPI(prompt);
-            if (advice) {
-                setCoachAdvice(advice);
-            } else {
-                setCoachAdvice("Could not generate advice right now. Please check back later.");
-            }
+    const getAICoachAdvice = useCallback(async () => {
+        setIsCoachLoading(true);
+        const recentTransactions = transactions.slice(0, 10).map(t => `${t.name}: ₹${t.amount}`).join(', ');
+        if (transactions.length === 0) {
+            setCoachAdvice("Add your first transaction to get personalized savings tips!");
             setIsCoachLoading(false);
-        };
-
-        getAICoachAdvice();
+            return;
+        }
+        const prompt = `Based on these recent transactions [${recentTransactions}], act as a friendly financial coach. Provide 3 specific, actionable tips to help the user save money. Format the response as a single string with each tip on a new line, starting with a bullet point (e.g., "• Tip 1...\\n• Tip 2...").`;
+        const advice = await callGeminiAPI(prompt);
+        if (advice) {
+            setCoachAdvice(advice);
+        } else {
+            setCoachAdvice("Could not generate advice right now. Please check back later.");
+        }
+        setIsCoachLoading(false);
     }, [transactions, callGeminiAPI]);
+
+    useEffect(() => {
+        getAICoachAdvice();
+    }, [getAICoachAdvice]);
 
     const badges = useMemo(() => {
         const unlocked = [];
@@ -351,4 +351,3 @@ export function ComparisonView({ allTransactions, callGeminiAPI }) {
         </div>
     );
 }
-
