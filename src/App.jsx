@@ -281,7 +281,7 @@ export default function App() {
             {notification.show && <div className={`notification ${notification.type}`}>{notification.message}</div>}
             <nav className="sidebar">
                 <div className="sidebar-header">
-                    <img src="/vite.svg" alt="Rooted Logo" className="logo" />
+                    <img src="/logo.svg" alt="Rooted Logo" className="logo" />
                     <h2>Rooted</h2>
                 </div>
                 <div className="sidebar-nav">
