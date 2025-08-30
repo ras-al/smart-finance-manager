@@ -156,11 +156,11 @@ body { background-color: var(--background-color); color: var(--text-color); over
 }
 
 
-/* --- App Layout --- */
+/* --- App Layout (Desktop) --- */
 .app-container { display: flex; flex-direction: column; height: 100vh; }
 .main-content { flex: 1; padding: 30px; overflow-y: auto; position: relative; }
 
-/* --- Sidebar (Desktop/Tablet) --- */
+/* --- Sidebar (Desktop) --- */
 .sidebar {
     width: 100%;
     background: var(--card-background);
