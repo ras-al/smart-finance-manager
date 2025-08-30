@@ -65,7 +65,7 @@ export function DashboardView({ analysis, userProfile, streaks, transactions, ca
                             <YAxis />
                             <CartesianGrid strokeDasharray="3 3" />
                             <Tooltip formatter={(value) => `₹${value.toFixed(2)}`} />
-                            <Line type="monotone" dataKey="spent" stroke="#ffc107" strokeWidth={2} activeDot={{ r: 8 }} />
+                            <Line type="monotone" dataKey="spent" stroke="var(--secondary-color)" strokeWidth={2} activeDot={{ r: 8 }} />
                         </LineChart>
                     </ResponsiveContainer>
                 </div>
@@ -131,7 +131,7 @@ export function AnalyticsView({ analysis, callGeminiAPI }) {
                     </div>
                 </div>
             </div>
-            <div className="card full-width"><h3>Spending & Health Correlation</h3><p>This chart shows the link between daily spending and calorie intake from food purchases.</p><ResponsiveContainer width="100%" height={400}><LineChart data={thisMonthTransactions.map(t => ({ date: new Date(t.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }), spending: t.amount, calories: t.estimatedCalories || 0 })).reverse()} margin={{ top: 5, right: 20, left: 10, bottom: 5 }}><CartesianGrid strokeDasharray="3 3" /><XAxis dataKey="date" /><YAxis yAxisId="left" stroke="#ffc107" label={{ value: 'Spending (₹)', angle: -90, position: 'insideLeft' }} /><YAxis yAxisId="right" orientation="right" stroke="#82ca9d" label={{ value: 'Calories (kcal)', angle: -90, position: 'insideRight' }}/><Tooltip /><Legend /><Line yAxisId="left" type="monotone" dataKey="spending" stroke="#ffc107" activeDot={{ r: 8 }} /><Line yAxisId="right" type="monotone" dataKey="calories" stroke="#82ca9d" /></LineChart></ResponsiveContainer></div>
+            <div className="card full-width"><h3>Spending & Health Correlation</h3><p>This chart shows the link between daily spending and calorie intake from food purchases.</p><ResponsiveContainer width="100%" height={400}><LineChart data={thisMonthTransactions.map(t => ({ date: new Date(t.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }), spending: t.amount, calories: t.estimatedCalories || 0 })).reverse()} margin={{ top: 5, right: 20, left: 10, bottom: 5 }}><CartesianGrid strokeDasharray="3 3" /><XAxis dataKey="date" /><YAxis yAxisId="left" stroke="var(--secondary-color)" label={{ value: 'Spending (₹)', angle: -90, position: 'insideLeft' }} /><YAxis yAxisId="right" orientation="right" stroke="#82ca9d" label={{ value: 'Calories (kcal)', angle: -90, position: 'insideRight' }}/><Tooltip /><Legend /><Line yAxisId="left" type="monotone" dataKey="spending" stroke="var(--secondary-color)" activeDot={{ r: 8 }} /><Line yAxisId="right" type="monotone" dataKey="calories" stroke="#82ca9d" /></LineChart></ResponsiveContainer></div>
         </div>
     );
 }
