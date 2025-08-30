@@ -1,6 +1,6 @@
-import React, { useState, useMemo, useEffect, useCallback } from 'react';
+import React, { useState, useMemo, useEffect, useCallback, useRef } from 'react';
 import { PieChart, Pie, Cell, Tooltip, Legend, ResponsiveContainer, LineChart, Line, CartesianGrid, XAxis, YAxis, BarChart, Bar } from 'recharts';
-import { db } from '../firebase';
+import { db } from '../firebase.js';
 import { doc, setDoc } from 'firebase/firestore';
 
 export function DashboardView({ analysis, userProfile, streaks, transactions, callGeminiAPI, aiAlert }) {
@@ -274,7 +274,7 @@ export function ComparisonView({ allTransactions, callGeminiAPI }) {
     const [isLoading, setIsLoading] = useState(false);
     const [aiSummary, setAiSummary] = useState('');
 
-    const handleCompare = async () => {
+    const handleCompare = useCallback(async () => {
         setIsLoading(true);
         setAiSummary('');
 
@@ -302,7 +302,7 @@ export function ComparisonView({ allTransactions, callGeminiAPI }) {
             setAiSummary(summary);
         }
         setIsLoading(false);
-    };
+    }, [allTransactions, period1, period2, callGeminiAPI]);
 
     return (
         <div className="comparison-view">
@@ -318,11 +318,11 @@ export function ComparisonView({ allTransactions, callGeminiAPI }) {
                     <input type="month" value={period2} onChange={e => setPeriod2(e.target.value)} />
                 </div>
                 <button onClick={handleCompare} disabled={isLoading} className="submit-btn">
-                    {isLoading ? 'Analyzing...' : 'Compare'}
+                    {isLoading ? 'Analyzing...' : 'Compare Periods'}
                 </button>
             </div>
 
-            {isLoading && !isLoading && (
+            {comparisonData && (
                 <div className="content-grid">
                     <div className="card">
                         <h3>Comparison Chart</h3>
@@ -333,15 +333,15 @@ export function ComparisonView({ allTransactions, callGeminiAPI }) {
                                 <YAxis />
                                 <Tooltip />
                                 <Legend />
-                                <Bar dataKey={period1} fill="#8884d8" />
-                                <Bar dataKey={period2} fill="#82ca9d" />
+                                <Bar dataKey={period1} fill="var(--primary-color)" />
+                                <Bar dataKey={period2} fill="var(--secondary-color)" />
                             </BarChart>
                         </ResponsiveContainer>
                     </div>
                     <div className="card">
                         <h3>AI Analysis</h3>
                         <div className="ai-feature-box">
-                            {aiSummary ? <div className="ai-result"><p>{aiSummary}</p></div> : <p>AI summary will appear here.</p>}
+                            {isLoading ? <p>Generating AI summary...</p> : aiSummary ? <div className="ai-result"><p>{aiSummary}</p></div> : <p>AI summary will appear here.</p>}
                         </div>
                     </div>
                 </div>
@@ -349,3 +349,97 @@ export function ComparisonView({ allTransactions, callGeminiAPI }) {
         </div>
     );
 }
+
+export function Chatbot({ callGeminiAPI, user, analysis }) {
+    const [isOpen, setIsOpen] = useState(false);
+    const userName = user?.displayName || user?.email.split('@')[0];
+    const [messages, setMessages] = useState([]);
+    const [input, setInput] = useState('');
+    const [isLoading, setIsLoading] = useState(false);
+    const messagesEndRef = useRef(null);
+
+    useEffect(() => {
+        if (isOpen) {
+            setMessages([
+                { sender: 'bot', text: `Hello, ${userName}! I am your Rooted financial assistant. How can I help you with your finances today?` }
+            ]);
+        }
+    }, [isOpen, userName]);
+
+    const scrollToBottom = () => {
+        messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+    };
+
+    useEffect(() => {
+        scrollToBottom();
+    }, [messages]);
+
+    const handleSendMessage = async (e) => {
+        e.preventDefault();
+        if (!input.trim()) return;
+
+        const userMessage = { sender: 'user', text: input };
+        setMessages(prev => [...prev, userMessage]);
+        setInput('');
+        setIsLoading(true);
+
+        const financialContext = `
+            Here is a summary of the user's current monthly finances:
+            - Total Spent: ₹${analysis.totalSpent.toFixed(2)}
+            - Junk Food Spending: ₹${analysis.junkFoodSpending.toFixed(2)}
+            - Impulse Spending: ₹${analysis.impulseSpending.toFixed(2)}
+            - Top Spending Category: ${analysis.pieData.length > 0 ? analysis.pieData.sort((a, b) => b.value - a.value)[0].name : 'N/A'}
+        `;
+
+        const systemInstruction = `You are a helpful and friendly financial assistant for an app called Rooted, speaking to a user named ${userName}. Your goal is to provide concise, clear, and encouraging advice on personal finance, budgeting, and healthy spending habits. Use the provided financial context to give personalized answers. Do not answer questions outside the scope of personal finance and well-being.
+    
+        ${financialContext}
+        `;
+
+        const response = await callGeminiAPI(input, systemInstruction);
+
+        if (response) {
+            const botMessage = { sender: 'bot', text: response };
+            setMessages(prev => [...prev, botMessage]);
+        } else {
+            const errorMessage = { sender: 'bot', text: "Sorry, I'm having trouble connecting right now. Please try again later." };
+            setMessages(prev => [...prev, errorMessage]);
+        }
+        setIsLoading(false);
+    };
+
+    return (
+        <div className="chatbot-container">
+            <button className="chatbot-toggle-btn" onClick={() => setIsOpen(!isOpen)}>
+                {isOpen ? '✕' : '💬'}
+            </button>
+            {isOpen && (
+                <div className="chatbot-window">
+                    <div className="chatbot-header">
+                        <h3>Rooted AI Assistant</h3>
+                    </div>
+                    <div className="chatbot-messages">
+                        {messages.map((msg, index) => (
+                            <div key={index} className={`message ${msg.sender}`}>
+                                {msg.text}
+                            </div>
+                        ))}
+                        {isLoading && <div className="message bot">Typing...</div>}
+                        <div ref={messagesEndRef} />
+                    </div>
+                    <form className="chatbot-input-form" onSubmit={handleSendMessage}>
+                        <input
+                            type="text"
+                            value={input}
+                            onChange={(e) => setInput(e.target.value)}
+                            placeholder="Ask a financial question..."
+                            disabled={isLoading}
+                        />
+                        <button type="submit" disabled={isLoading}>Send</button>
+                    </form>
+                </div>
+            )}
+        </div>
+    );
+}
+

@@ -1,8 +1,8 @@
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
-import { auth, db } from './firebase';
+import { auth, db } from './firebase.js';
 import { onAuthStateChanged, createUserWithEmailAndPassword, signInWithEmailAndPassword } from 'firebase/auth';
 import { collection, addDoc, onSnapshot, query, where, doc, setDoc } from 'firebase/firestore';
-import { DashboardView, AddTransactionView, AnalyticsView, GoalsView, ReportsView, SettingsView, ComparisonView } from './components/Views';
+import { DashboardView, AddTransactionView, AnalyticsView, GoalsView, ReportsView, SettingsView, ComparisonView, Chatbot } from './components/Views.jsx';
 import './styles.css';
 
 // --- Main App Component ---
@@ -26,41 +26,35 @@ export default function App() {
 
     // --- Theme Toggling Effect ---
     useEffect(() => {
-        // Check for system preference on component mount
-        const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-        setTheme(prefersDark ? 'dark' : 'light');
-        document.body.className = prefersDark ? 'dark-theme' : 'light-theme';
-
-        // Add a listener to update the theme if the system preference changes
-        const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
-        const handler = (e) => {
-            const newTheme = e.matches ? 'dark' : 'light';
-            setTheme(newTheme);
-            document.body.className = newTheme + '-theme';
-        };
-        mediaQuery.addEventListener('change', handler);
-
-        // Clean up the event listener
-        return () => mediaQuery.removeEventListener('change', handler);
-    }, []); // Empty dependency array means this runs only on mount and unmount
+        const localTheme = localStorage.getItem('zenith-theme') || 'light';
+        setTheme(localTheme);
+        document.body.className = localTheme + '-theme';
+    }, []);
 
     const toggleTheme = () => {
         setTheme(prevTheme => {
             const newTheme = prevTheme === 'light' ? 'dark' : 'light';
+            localStorage.setItem('zenith-theme', newTheme);
             document.body.className = newTheme + '-theme';
             return newTheme;
         });
     };
 
     // --- Gemini API Call Helper ---
-    const callGeminiAPI = useCallback(async (prompt) => {
+    const callGeminiAPI = useCallback(async (prompt, systemInstruction = "") => {
         const apiKey = import.meta.env.VITE_GEMINI_API_KEY;
         const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=${apiKey}`;
+        
+        const payload = {
+            contents: [{ parts: [{ text: prompt }] }],
+            systemInstruction: { parts: [{ text: systemInstruction }] }
+        };
+
         try {
             const response = await fetch(apiUrl, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }] })
+                body: JSON.stringify(payload)
             });
             if (!response.ok) throw new Error(`API call failed with status: ${response.status}`);
             const result = await response.json();
@@ -72,22 +66,27 @@ export default function App() {
         }
     }, []);
 
+
     // --- Authentication Effect ---
     useEffect(() => {
         const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
             if (currentUser) {
-                setUser(currentUser);
                 const userDocRef = doc(db, "users", currentUser.uid);
                 const unsubProfile = onSnapshot(userDocRef, (docSnap) => {
                     if (docSnap.exists()) {
                         const data = docSnap.data();
+                        // Update user state with displayName from Firestore
+                        setUser({ ...currentUser, displayName: data.displayName });
                         setUserProfile(data.profile || defaultProfile);
                         setStreaks(data.streaks || { noJunkFood: 0, noImpulseSpending: 0 });
                     } else {
+                        const displayName = currentUser.email.split('@')[0];
+                        // Also set the displayName in the user state immediately
+                        setUser({ ...currentUser, displayName: displayName });
                         setUserProfile(defaultProfile);
                         setDoc(userDocRef, {
                             email: currentUser.email,
-                            displayName: currentUser.email.split('@')[0],
+                            displayName: displayName,
                             profile: defaultProfile,
                             streaks: { noJunkFood: 0, noImpulseSpending: 0 },
                             createdAt: new Date()
@@ -111,7 +110,7 @@ export default function App() {
             const q = query(collection(db, "transactions"), where("userId", "==", user.uid));
             const unsubscribe = onSnapshot(q, (querySnapshot) => {
                 const transactionsData = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-                transactionsData.sort((a, b) => new Date(b.date) - new Date(b.date));
+                transactionsData.sort((a, b) => new Date(b.date) - new Date(a.date));
                 setTransactions(transactionsData);
             });
             return () => unsubscribe();
@@ -119,8 +118,6 @@ export default function App() {
     }, [user]);
 
     // --- Streak Calculation Effect ---
-    // This effect now only calculates local streaks based on the transaction data.
-    // Writing to Firestore is now decoupled to prevent unnecessary database writes.
     useEffect(() => {
         if (transactions.length > 0 && user) {
             const updateStreaks = () => {
@@ -133,13 +130,11 @@ export default function App() {
                     if (t.isImpulse) lastImpulseDate = tDate;
                 }
                 if (lastJunkDate) junkStreak = Math.floor((today - lastJunkDate) / (1000 * 60 * 60 * 24));
-                else junkStreak = Math.floor((today - new Date(sorted[0].date)) / (1000 * 60 * 60 * 24));
+                else if (sorted.length > 0) junkStreak = Math.floor((today - new Date(sorted[0].date)) / (1000 * 60 * 60 * 24));
                 if (lastImpulseDate) impulseStreak = Math.floor((today - lastImpulseDate) / (1000 * 60 * 60 * 24));
-                else impulseStreak = Math.floor((today - new Date(sorted[0].date)) / (1000 * 60 * 60 * 24));
+                else if (sorted.length > 0) impulseStreak = Math.floor((today - new Date(sorted[0].date)) / (1000 * 60 * 60 * 24));
                 const newStreaks = { noJunkFood: Math.max(0, junkStreak), noImpulseSpending: Math.max(0, impulseStreak) };
                 setStreaks(newStreaks);
-                // To further optimize, Firestore write could be triggered on app close/logout instead of every transaction update.
-                // setDoc(doc(db, "users", user.uid), { streaks: newStreaks }, { merge: true });
             };
             updateStreaks();
         }
@@ -245,7 +240,7 @@ export default function App() {
     
     // --- Render Logic ---
     if (loading || (user && !userProfile)) {
-        return <div className="loading-screen"><h1>Loading Smart Manager...</h1></div>;
+        return <div className="loading-screen"><h1>Loading Zenith...</h1></div>;
     }
 
     if (!user) {
@@ -254,8 +249,8 @@ export default function App() {
                 {notification.show && <div className={`notification ${notification.type}`}>{notification.message}</div>}
                 <div className="login-container">
                     <div className="login-box">
-                        <h1>{isLoginView ? 'Welcome Back' : 'Create Account'}</h1>
-                        <p>Your AI companion for better savings and health.</p>
+                        <h1>{isLoginView ? 'Welcome to Zenith' : 'Create Account'}</h1>
+                        <p>Your AI companion for peak financial wellness.</p>
                         <form onSubmit={isLoginView ? handleLogin : handleSignUp} className="auth-form">
                             <input name="email" type="email" placeholder="Email" value={authDetails.email} onChange={handleAuthChange} required />
                             <input name="password" type="password" placeholder="Password" value={authDetails.password} onChange={handleAuthChange} required />
@@ -286,8 +281,8 @@ export default function App() {
             {notification.show && <div className={`notification ${notification.type}`}>{notification.message}</div>}
             <nav className="sidebar">
                 <div className="sidebar-header">
-                    <img src="/vite.svg" alt="Smart AI Logo" className="logo" />
-                    <h2>Smart AI</h2>
+                    <img src="/vite.svg" alt="Zenith Logo" className="logo" />
+                    <h2>Zenith</h2>
                 </div>
                 <div className="sidebar-nav">
                     <button onClick={() => setView('dashboard')} className={view === 'dashboard' ? 'active' : ''}>Dashboard</button>
@@ -307,8 +302,12 @@ export default function App() {
                      <button onClick={() => auth.signOut()} className="logout-btn">Logout</button>
                 </div>
             </nav>
-            <main className="main-content">{renderView()}</main>
+            <main className="main-content">
+                {renderView()}
+                <Chatbot callGeminiAPI={callGeminiAPI} user={user} analysis={analysis} />
+            </main>
             <button className="fab" onClick={() => setView('add')}>+</button>
         </div>
     );
 }
+
