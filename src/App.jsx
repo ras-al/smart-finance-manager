@@ -24,17 +24,29 @@ export default function App() {
 
     const defaultProfile = { junkFoodLimit: 2000, impulseSpendingLimit: 10000, savingsGoal: 5000 };
 
-    // --- Theme Toggling Effect ---
+    // --- Theme Toggling Effect to match system default ---
     useEffect(() => {
-        const localTheme = localStorage.getItem('Rooted-theme') || 'light';
-        setTheme(localTheme);
-        document.body.className = localTheme + '-theme';
+        // Check for system preference on component mount
+        const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+        const handler = (e) => {
+            const newTheme = e.matches ? 'dark' : 'light';
+            setTheme(newTheme);
+            document.body.className = newTheme + '-theme';
+        };
+        
+        // Set initial theme
+        handler(mediaQuery);
+
+        // Add a listener to update the theme if the system preference changes
+        mediaQuery.addEventListener('change', handler);
+
+        // Clean up the event listener
+        return () => mediaQuery.removeEventListener('change', handler);
     }, []);
 
     const toggleTheme = () => {
         setTheme(prevTheme => {
             const newTheme = prevTheme === 'light' ? 'dark' : 'light';
-            localStorage.setItem('Rooted-theme', newTheme);
             document.body.className = newTheme + '-theme';
             return newTheme;
         });
@@ -110,7 +122,7 @@ export default function App() {
             const q = query(collection(db, "transactions"), where("userId", "==", user.uid));
             const unsubscribe = onSnapshot(q, (querySnapshot) => {
                 const transactionsData = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-                transactionsData.sort((a, b) => new Date(b.date) - new Date(a.date));
+                transactionsData.sort((a, b) => new Date(b.date) - new Date(b.date));
                 setTransactions(transactionsData);
             });
             return () => unsubscribe();
@@ -310,4 +322,3 @@ export default function App() {
         </div>
     );
 }
-
