@@ -26,7 +26,7 @@ export default function App() {
 
     // --- Theme Toggling Effect ---
     useEffect(() => {
-        const localTheme = localStorage.getItem('zenith-theme') || 'light';
+        const localTheme = localStorage.getItem('Rooted-theme') || 'light';
         setTheme(localTheme);
         document.body.className = localTheme + '-theme';
     }, []);
@@ -34,7 +34,7 @@ export default function App() {
     const toggleTheme = () => {
         setTheme(prevTheme => {
             const newTheme = prevTheme === 'light' ? 'dark' : 'light';
-            localStorage.setItem('zenith-theme', newTheme);
+            localStorage.setItem('Rooted-theme', newTheme);
             document.body.className = newTheme + '-theme';
             return newTheme;
         });
@@ -240,7 +240,7 @@ export default function App() {
     
     // --- Render Logic ---
     if (loading || (user && !userProfile)) {
-        return <div className="loading-screen"><h1>Loading Zenith...</h1></div>;
+        return <div className="loading-screen"><h1>Loading Rooted...</h1></div>;
     }
 
     if (!user) {
@@ -249,7 +249,7 @@ export default function App() {
                 {notification.show && <div className={`notification ${notification.type}`}>{notification.message}</div>}
                 <div className="login-container">
                     <div className="login-box">
-                        <h1>{isLoginView ? 'Welcome to Zenith' : 'Create Account'}</h1>
+                        <h1>{isLoginView ? 'Welcome to Rooted' : 'Create Account'}</h1>
                         <p>Your AI companion for peak financial wellness.</p>
                         <form onSubmit={isLoginView ? handleLogin : handleSignUp} className="auth-form">
                             <input name="email" type="email" placeholder="Email" value={authDetails.email} onChange={handleAuthChange} required />
@@ -281,8 +281,8 @@ export default function App() {
             {notification.show && <div className={`notification ${notification.type}`}>{notification.message}</div>}
             <nav className="sidebar">
                 <div className="sidebar-header">
-                    <img src="/vite.svg" alt="Zenith Logo" className="logo" />
-                    <h2>Zenith</h2>
+                    <img src="/vite.svg" alt="Rooted Logo" className="logo" />
+                    <h2>Rooted</h2>
                 </div>
                 <div className="sidebar-nav">
                     <button onClick={() => setView('dashboard')} className={view === 'dashboard' ? 'active' : ''}>Dashboard</button>
