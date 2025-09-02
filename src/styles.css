@@ -1,81 +1,105 @@
 /* --- Root Variables for Theming (Light Theme) --- */
 :root {
-    --primary-color: #002B36; /* Deep dark teal */
-    --secondary-color: #14655B; /* Vibrant emerald green */
-    --accent-light-color: #A7FFEB; /* Light, minty teal */
-    --background-color: #f4f7fd; /* Keeping a light background for general app UI */
-    --card-background: #ffffff;
-    --text-color: #333;
-    --text-light: #777;
-    --border-color: #e0e0e0;
-    --shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
-    --success-color: #2ecc71;
-    --warning-color: #f39c12;
-    --danger-color: #e74c3c;
+--primary-color: #002B36; /* Deep dark teal */
+--secondary-color: #14655B; /* Vibrant emerald green */
+--accent-light-color: #A7FFEB; /* Light, minty teal */
+--background-color: #f4f7fd; /* Keeping a light background for general app UI */
+--card-background: #ffffff;
+--text-color: #333;
+--text-light: #777;
+--border-color: #e0e0e0;
+--shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+--success-color: #2ecc71;
+--warning-color: #f39c12;
+--danger-color: #e74c3c;
+--section-gap: 30px;
 }
 
 /* --- Dark Theme Variables --- */
 body.dark-theme {
-    --primary-color: #002B36; /* Stays the deep dark teal */
-    --secondary-color: #14655B; /* Stays the vibrant emerald green */
-    --accent-light-color: #A7FFEB; /* Stays the light minty teal */
-    --background-color: #121212; /* Dark background for dark theme */
-    --card-background: #1e1e1e;
-    --text-color: #e0e0e0;
-    --text-light: #a0a0a0;
-    --border-color: #333333;
-    --shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+--primary-color: #002B36; /* Stays the deep dark teal */
+--secondary-color: #14655B; /* Stays the vibrant emerald green */
+--accent-light-color: #A7FFEB; /* Stays the light minty teal */
+--background-color: #121212; /* Dark background for dark theme */
+--card-background: #1e1e1e;
+--text-color: #e0e0e0;
+--text-light: #a0a0a0;
+--border-color: #333333;
+--shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
 }
 
 /* --- Animation Keyframes --- */
 @keyframes fadeIn {
-    from {
-        opacity: 0;
-        transform: translateY(10px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
+from {
+opacity: 0;
+transform: translateY(10px);
+}
+to {
+opacity: 1;
+transform: translateY(0);
+}
 }
 
 @keyframes pulse {
-    0% {
-        box-shadow: 0 0 0 0 rgba(20, 101, 91, 0.4); /* Using the secondary color for pulse */
-    }
-    70% {
-        box-shadow: 0 0 0 10px rgba(20, 101, 91, 0);
-    }
-    100% {
-        box-shadow: 0 0 0 0 rgba(20, 101, 91, 0);
-    }
+0% {
+box-shadow: 0 0 0 0 rgba(20, 101, 91, 0.4); /* Using the secondary color for pulse */
+}
+70% {
+box-shadow: 0 0 0 10px rgba(20, 101, 91, 0);
+}
+100% {
+box-shadow: 0 0 0 0 rgba(20, 101, 91, 0);
+}
 }
 
 /* Continuous wave gradient animation for background */
 @keyframes continuous-wave {
-    0% { background-position: 0% 50%; }
-    100% { background-position: 100% 50%; }
+0% { background-position: 0% 50%; }
+100% { background-position: 100% 50%; }
 }
 
 /* New pulsing glow animation for the floating action button */
 @keyframes fab-glow {
-    0% {
-        box-shadow: 0 0 0 0 rgba(20, 101, 91, 0.7); /* Using the secondary color for glow */
-    }
-    70% {
-        box-shadow: 0 0 0 15px rgba(20, 101, 91, 0);
-    }
-    100% {
-        box-shadow: 0 0 0 0 rgba(20, 101, 91, 0);
-    }
+0% {
+box-shadow: 0 0 0 0 rgba(20, 101, 91, 0.7); /* Using the secondary color for glow */
+}
+70% {
+box-shadow: 0 0 0 15px rgba(20, 101, 91, 0);
+}
+100% {
+box-shadow: 0 0 0 0 rgba(20, 101, 91, 0);
+}
 }
 
 /* Wave-like gradient animation for text */
 @keyframes text-wave {
-    0% { background-position: 100% 0; }
-    100% { background-position: 0% 0; }
+0% { background-position: 100% 0; }
+100% { background-position: 0% 0; }
 }
 
+/* Logo specific animations */
+@keyframes logo-grow-in {
+0% {
+opacity: 0;
+transform: scale(0.5);
+}
+100% {
+opacity: 1;
+transform: scale(1);
+}
+}
+
+@keyframes intro-fade-out {
+0% {
+opacity: 1;
+}
+80% {
+opacity: 1;
+}
+100% {
+opacity: 0;
+}
+}
 
 * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', 'Segoe UI', 'Roboto', 'Helvetica Neue', sans-serif; }
 body { background-color: var(--background-color); color: var(--text-color); overflow-x: hidden; transition: background-color 0.3s, color 0.3s; }
@@ -83,142 +107,173 @@ body { background-color: var(--background-color); color: var(--text-color); over
 
 /* The loading and login screens now use a professional, emerald gradient */
 .loading-screen, .login-container {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    height: 100vh;
-    width: 100vw;
-    background: linear-gradient(135deg, #002B36, #14655B); /* Deep to vibrant teal */
-    background-size: 400% 400%;
-    animation: continuous-wave 15s ease infinite;
-    color: white;
-    text-align: center;
+display: flex;
+align-items: center;
+justify-content: center;
+height: 100vh;
+width: 100vw;
+background: linear-gradient(135deg, #002B36, #14655B); /* Deep to vibrant teal */
+background-size: 400% 400%;
+animation: continuous-wave 15s ease infinite;
+color: white;
+text-align: center;
+}
+
+.intro-screen {
+display: flex;
+flex-direction: column;
+align-items: center;
+justify-content: center;
+height: 100vh;
+width: 100vw;
+background: linear-gradient(135deg, #002B36, #14655B);
+background-size: 400% 400%;
+animation: continuous-wave 15s ease infinite, intro-fade-out 3s ease-out forwards;
+color: white;
+text-align: center;
+position: fixed;
+top: 0;
+left: 0;
+z-index: 2000;
+}
+
+.intro-logo {
+width: 100px;
+height: 100px;
+margin-bottom: 20px;
+animation: logo-grow-in 1.5s cubic-bezier(0.68, -0.55, 0.27, 1.55) forwards;
+}
+
+.intro-text {
+font-size: 2em;
+font-weight: 700;
+opacity: 0;
+animation: fadeIn 1s ease-out 1.5s forwards;
 }
 
 .login-box {
-    background: rgba(255, 255, 255, 0.15); /* Semi-transparent white card */
-    padding: 40px;
-    border-radius: 20px;
-    backdrop-filter: blur(10px);
-    border: 1px solid rgba(255, 255, 255, 0.25);
-    width: 90%;
-    max-width: 400px;
-    animation: fadeIn 0.5s ease-out;
-    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.3);
+background: rgba(255, 255, 255, 0.15); /* Semi-transparent white card */
+padding: 40px;
+border-radius: 20px;
+backdrop-filter: blur(10px);
+border: 1px solid rgba(255, 255, 255, 0.25);
+width: 90%;
+max-width: 400px;
+animation: fadeIn 0.5s ease-out;
+box-shadow: 0 8px 30px rgba(0, 0, 0, 0.3);
 }
 .login-box h1 { margin-bottom: 10px; font-size: 2.2em; font-weight: 700; color: var(--accent-light-color); } /* Light teal heading */
 .login-box p { margin-bottom: 20px; opacity: 0.9; font-size: 1.1em; color: var(--accent-light-color); } /* Light teal text */
 .auth-form { display: flex; flex-direction: column; gap: 15px; }
 .auth-form input {
-    background: rgba(255,255,255,0.25);
-    border: 1px solid rgba(255,255,255,0.4);
-    padding: 14px;
-    border-radius: 10px;
-    color: white;
-    font-size: 16px;
-    transition: background-color 0.3s, border-color 0.3s;
+background: rgba(255,255,255,0.25);
+border: 1px solid rgba(255,255,255,0.4);
+padding: 14px;
+border-radius: 10px;
+color: white;
+font-size: 16px;
+transition: background-color 0.3s, border-color 0.3s;
 }
 .auth-form input::placeholder { color: rgba(255,255,255,0.7); }
 .auth-form input:focus {
-    background: rgba(255, 255, 255, 0.35);
-    border-color: rgba(255, 255, 255, 0.6);
-    outline: none;
+background: rgba(255, 255, 255, 0.35);
+border-color: rgba(255, 255, 255, 0.6);
+outline: none;
 }
 
 .auth-form button {
-    background: var(--accent-light-color); /* Light teal button */
-    color: var(--primary-color); /* Deep dark teal text on button */
-    border: none;
-    padding: 15px;
-    border-radius: 10px;
-    font-weight: 700;
-    cursor: pointer;
-    transition: all 0.3s ease;
+background: var(--accent-light-color); /* Light teal button */
+color: var(--primary-color); /* Deep dark teal text on button */
+border: none;
+padding: 15px;
+border-radius: 10px;
+font-weight: 700;
+cursor: pointer;
+transition: all 0.3s ease;
 }
 .auth-form button:hover {
-    background: #8de8d8; /* Slightly darker light teal on hover */
-    transform: translateY(-3px) scale(1.01);
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+background: #8de8d8; /* Slightly darker light teal on hover */
+transform: translateY(-3px) scale(1.01);
+box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
 }
 .auth-toggle { margin-top: 25px; font-size: 15px; }
 .auth-toggle button {
-    background: none;
-    border: none;
-    color: var(--accent-light-color);
-    text-decoration: underline;
-    cursor: pointer;
-    font-size: 15px;
-    margin-left: 5px;
-    transition: color 0.2s;
+background: none;
+border: none;
+color: var(--accent-light-color);
+text-decoration: underline;
+cursor: pointer;
+font-size: 15px;
+margin-left: 5px;
+transition: color 0.2s;
 }
 .auth-toggle button:hover {
-    color: #ccffee; /* Even lighter teal on hover */
+color: #ccffee; /* Even lighter teal on hover */
 }
 
-
-/* --- App Layout --- */
+/* --- App Layout (Desktop) --- */
 .app-container { display: flex; flex-direction: column; height: 100vh; }
 .main-content { flex: 1; padding: 30px; overflow-y: auto; position: relative; }
 
-/* --- Sidebar (Desktop/Tablet) --- */
+/* --- Sidebar (Desktop) --- */
 .sidebar {
-    width: 100%;
-    background: var(--card-background);
-    display: flex;
-    flex-direction: row;
-    justify-content: space-between;
-    align-items: center;
-    border-bottom: 1px solid var(--border-color);
-    padding: 10px 20px;
-    transition: background-color 0.3s, border-color 0.3s;
+width: 100%;
+background: var(--card-background);
+display: flex;
+flex-direction: row;
+justify-content: space-between;
+align-items: center;
+border-bottom: 1px solid var(--border-color);
+padding: 10px 20px;
+transition: background-color 0.3s, border-color 0.3s;
 }
 
 .sidebar-header {
-    display: flex;
-    align-items: center;
-    gap: 10px;
+display: flex;
+align-items: center;
+gap: 10px;
 }
 
 /* Animated "Smart AI" text */
 .sidebar-header h2 {
-    font-size: 24px;
-    font-weight: 700;
-    background: linear-gradient(90deg, var(--primary-color), var(--accent-light-color), var(--primary-color));
-    background-size: 200% auto;
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    animation: text-wave 3s linear infinite;
+font-size: 24px;
+font-weight: 700;
+background: linear-gradient(90deg, var(--primary-color), var(--accent-light-color), var(--primary-color));
+background-size: 200% auto;
+-webkit-background-clip: text;
+-webkit-text-fill-color: transparent;
+animation: text-wave 3s linear infinite;
 }
 
 .sidebar-header .logo {
-    width: 32px;
-    height: 32px;
+width: 32px;
+height: 32px;
 }
 .sidebar-nav { display: flex; flex-direction: row; gap: 10px; }
 .sidebar-nav button { background: none; border: none; text-align: left; padding: 12px 15px; border-radius: 8px; cursor: pointer; font-size: 16px; color: var(--text-light); transition: all 0.2s ease; }
 .sidebar-nav button:hover { background-color: var(--background-color); color: var(--text-color); }
 .sidebar-nav button.active {
-    background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
-    color: white;
-    font-weight: 600;
+background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
+color: white;
+font-weight: 600;
 }
 .sidebar-footer { display: flex; align-items: center; gap: 15px; }
 .user-profile { display: flex; align-items: center; justify-content: center; gap: 10px; padding: 10px; border-radius: 8px; background-color: var(--background-color); }
 .logout-btn { width: auto; margin-top: 0; padding: 10px; border: 1px solid var(--border-color); background: transparent; color: var(--text-light); border-radius: 8px; cursor: pointer; transition: all 0.2s ease; }
 .logout-btn:hover { background-color: var(--danger-color); color: white; border-color: var(--danger-color); }
 .theme-toggle {
-    background: var(--background-color);
-    border: 1px solid var(--border-color);
-    color: var(--text-color);
-    width: 40px;
-    height: 40px;
-    border-radius: 50%;
-    cursor: pointer;
-    font-size: 1.5rem;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: background 0.2s, color 0.2s;
+background: var(--background-color);
+border: 1px solid var(--border-color);
+color: var(--text-color);
+width: 40px;
+height: 40px;
+border-radius: 50%;
+cursor: pointer;
+font-size: 1.5rem;
+display: flex;
+align-items: center;
+justify-content: center;
+transition: background 0.2s, color 0.2s;
 }
 .theme-toggle:hover { background: var(--border-color); }
 
@@ -232,15 +287,18 @@ body { background-color: var(--background-color); color: var(--text-color); over
 .kpi-card p { font-size: 24px; font-weight: 700; }
 .kpi-subtext { font-size: 12px; color: var(--text-light); }
 .kpi-subtext.danger { color: var(--danger-color); } .kpi-subtext.safe { color: var(--success-color); }
+.card.full-width + .content-grid    {
+  margin-top: var(--section-gap);
+}
 .content-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 30px; margin-bottom: 30px; }
 .card { background: var(--card-background); padding: 25px; border-radius: 12px; box-shadow: var(--shadow); transition: background-color 0.3s; animation: fadeIn 0.5s ease-out; }
 .card.full-width { grid-column: 1 / -1; }
 .card h3 { margin-bottom: 20px; }
 
 .monthly-graph-container {
-    width: 100%;
-    height: 300px; /* Or any desired height */
-    margin-bottom: 30px;
+width: 100%;
+height: 300px; /* Or any desired height */
+margin-bottom: 30px;
 }
 
 .ai-alert { background-color: #fef3e2; border: 1px solid #f39c12; margin-bottom: 30px; animation: pulse 2s infinite; }
@@ -267,24 +325,24 @@ body { background-color: var(--background-color); color: var(--text-color); over
 .transaction-amount { font-weight: 600; font-size: 16px; }
 /* Applying the new glow animation to the home button */
 .fab {
-    position: fixed;
-    bottom: 30px;
-    right: 30px;
-    width: 60px;
-    height: 60px;
-    border-radius: 50%;
-    background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
-    color: white;
-    border: none;
-    font-size: 32px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
-    cursor: pointer;
-    transition: transform 0.2s ease;
-    animation: fab-glow 2s infinite;
-    z-index: 1000;
+position: fixed;
+bottom: 30px;
+right: 30px;
+width: 60px;
+height: 60px;
+border-radius: 50%;
+background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+color: white;
+border: none;
+font-size: 32px;
+display: flex;
+align-items: center;
+justify-content: center;
+box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
+cursor: pointer;
+transition: transform 0.2s ease;
+animation: fab-glow 2s infinite;
+z-index: 1000;
 }
 .fab:hover { transform: scale(1.1); }
 .add-transaction-view, .analytics-view, .goals-view, .reports-view, .settings-view, .comparison-view { max-width: 800px; margin: 0 auto; }
@@ -310,126 +368,141 @@ body { background-color: var(--background-color); color: var(--text-color); over
 
 /* --- Chatbot Styles --- */
 .chatbot-container {
-    position: fixed;
-    bottom: 30px;
-    right: 100px; /* Position next to the FAB */
-    z-index: 1000;
+position: fixed;
+bottom: 30px;
+right: 100px; /* Position next to the FAB */
+z-index: 1000;
 }
 .chatbot-toggle-btn {
-    width: 60px;
-    height: 60px;
-    border-radius: 50%;
-    background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
-    color: white;
-    font-size: 28px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
-    border: none;
-    cursor: pointer;
-    transition: transform 0.2s ease, background-color 0.3s;
+width: 60px;
+height: 60px;
+border-radius: 50%;
+background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+color: white;
+font-size: 28px;
+display: flex;
+align-items: center;
+justify-content: center;
+box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
+border: none;
+cursor: pointer;
+transition: transform 0.2s ease, background-color 0.3s;
 }
 .chatbot-toggle-btn:hover {
-    transform: scale(1.1);
+transform: scale(1.1);
 }
 .chatbot-window {
-    position: absolute;
-    bottom: 80px;
-    right: 0;
-    width: 350px;
-    height: 450px;
-    background: var(--card-background);
-    border-radius: 15px;
-    box-shadow: var(--shadow);
-    display: flex;
-    flex-direction: column;
-    overflow: hidden;
-    animation: fadeIn 0.3s ease-out;
+position: absolute;
+bottom: 80px;
+right: 0;
+width: 350px;
+height: 450px;
+background: var(--card-background);
+border-radius: 15px;
+box-shadow: var(--shadow);
+display: flex;
+flex-direction: column;
+overflow: hidden;
+animation: fadeIn 0.3s ease-out;
 }
 .chatbot-header {
-    padding: 15px;
-    background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
-    color: white;
-    text-align: center;
+padding: 15px;
+background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
+color: white;
+text-align: center;
 }
 .chatbot-header h3 {
-    margin: 0;
-    font-size: 1.1rem;
+margin: 0;
+font-size: 1.1rem;
 }
 .chatbot-messages {
-    flex: 1;
-    padding: 15px;
-    overflow-y: auto;
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
+flex: 1;
+padding: 15px;
+overflow-y: auto;
+display: flex;
+flex-direction: column;
+gap: 12px;
 }
 .message {
-    padding: 10px 15px;
-    border-radius: 18px;
-    max-width: 80%;
-    line-height: 1.4;
+padding: 10px 15px;
+border-radius: 18px;
+max-width: 80%;
+line-height: 1.4;
 }
 .message.user {
-    background-color: var(--accent-light-color);
-    color: var(--primary-color);
-    align-self: flex-end;
-    border-bottom-right-radius: 4px;
+background-color: var(--accent-light-color);
+color: var(--primary-color);
+align-self: flex-end;
+border-bottom-right-radius: 4px;
 }
 .message.bot {
-    background-color: var(--background-color);
-    color: var(--text-color);
-    align-self: flex-start;
-    border-bottom-left-radius: 4px;
+background-color: var(--background-color);
+color: var(--text-color);
+align-self: flex-start;
+border-bottom-left-radius: 4px;
 }
 .chatbot-input-form {
-    display: flex;
-    padding: 10px;
-    border-top: 1px solid var(--border-color);
+display: flex;
+padding: 10px;
+border-top: 1px solid var(--border-color);
 }
 .chatbot-input-form input {
-    flex: 1;
-    border: none;
-    background-color: transparent;
-    padding: 10px;
-    color: var(--text-color);
+flex: 1;
+border: none;
+background-color: transparent;
+padding: 10px;
+color: var(--text-color);
 }
 .chatbot-input-form input:focus {
-    box-shadow: none;
+box-shadow: none;
 }
 .chatbot-input-form button {
-    background: none;
-    color: var(--secondary-color);
-    font-weight: bold;
-    padding: 0 10px;
+background: none;
+color: var(--secondary-color);
+font-weight: bold;
+padding: 0 10px;
 }
 
 @media (max-width: 768px) {
-    .app-container { flex-direction: column-reverse; }
-    .main-content { padding: 15px; }
-    .sidebar { order: 2; }
-    .sidebar-header, .user-profile, .logout-btn { display: none; }
-    .theme-toggle { 
-        display: flex; 
-        position: absolute; 
-        top: 10px; 
-        right: 10px; 
-        width: 36px; 
-        height: 36px; 
-        font-size: 1.2rem; 
-    }
-    .sidebar-nav { width: 100%; justify-content: space-around; }
-    .sidebar-nav button { flex-grow: 1; text-align: center; font-size: 14px; padding: 8px 10px; }
-    .content-grid { grid-template-columns: 1fr; }
-    .fab { bottom: 80px; right: 15px; }
-    .chatbot-container { bottom: 15px; right: 15px; }
-    .chatbot-window { width: calc(100vw - 30px); height: 70vh; bottom: 80px;}
-    .chatbot-toggle-btn {
-        display: flex;
-    }
-    /* Make FAB the chatbot opener on mobile */
-    .fab.chat-active {
-        background: var(--danger-color);
-    }
+.app-container { flex-direction: column-reverse; }
+.main-content { padding: 15px; }
+.sidebar {
+order: 2;
+position: fixed;
+bottom: 0;
+left: 0;
+width: 100%;
+height: auto;
+border-top: 1px solid var(--border-color);
+border-bottom: none;
+background: var(--card-background);
+justify-content: space-around;
+padding: 10px 5px;
+box-shadow: 0 -4px 12px rgba(0,0,0,0.08);
+z-index: 100;
+}
+.sidebar-header, .user-profile, .logout-btn { display: none; }
+.theme-toggle {
+display: flex;
+position: fixed;
+top: 10px;
+right: 10px;
+width: 36px;
+height: 36px;
+font-size: 1.2rem;
+z-index: 101;
+}
+.sidebar-nav { width: 100%; justify-content: space-around; }
+.sidebar-nav button { flex-grow: 1; text-align: center; font-size: 14px; padding: 8px 5px; }
+.content-grid { grid-template-columns: 1fr; }
+.fab { bottom: 80px; right: 15px; }
+.chatbot-container { bottom: 15px; right: 15px; }
+.chatbot-window { width: calc(100vw - 30px); height: 70vh; bottom: 80px;}
+.chatbot-toggle-btn {
+display: flex;
+}
+/* Make FAB the chatbot opener on mobile */
+.fab.chat-active {
+background: var(--danger-color);
+}
 }

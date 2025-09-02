@@ -21,20 +21,43 @@ export default function App() {
     const [isLoginView, setIsLoginView] = useState(true);
     const [aiAlert, setAiAlert] = useState('');
     const [theme, setTheme] = useState('light'); // 'light' or 'dark'
+    const [showIntro, setShowIntro] = useState(true);
 
     const defaultProfile = { junkFoodLimit: 2000, impulseSpendingLimit: 10000, savingsGoal: 5000 };
-
-    // --- Theme Toggling Effect ---
+    
+    // --- Intro Animation Timing Effect ---
     useEffect(() => {
-        const localTheme = localStorage.getItem('Rooted-theme') || 'light';
-        setTheme(localTheme);
-        document.body.className = localTheme + '-theme';
+        // Hide the intro screen after 3 seconds
+        const timer = setTimeout(() => {
+            setShowIntro(false);
+        }, 3000);
+        
+        return () => clearTimeout(timer);
+    }, []);
+
+    // --- Theme Toggling Effect to match system default ---
+    useEffect(() => {
+        // Check for system preference on component mount
+        const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+        const handler = (e) => {
+            const newTheme = e.matches ? 'dark' : 'light';
+            setTheme(newTheme);
+            document.body.className = newTheme + '-theme';
+        };
+        
+        // Set initial theme
+        handler(mediaQuery);
+
+        // Add a listener to update the theme if the system preference changes
+        mediaQuery.addEventListener('change', handler);
+
+        // Clean up the event listener
+        return () => mediaQuery.removeEventListener('change', handler);
     }, []);
 
     const toggleTheme = () => {
         setTheme(prevTheme => {
             const newTheme = prevTheme === 'light' ? 'dark' : 'light';
-            localStorage.setItem('Rooted-theme', newTheme);
             document.body.className = newTheme + '-theme';
             return newTheme;
         });
@@ -110,7 +133,7 @@ export default function App() {
             const q = query(collection(db, "transactions"), where("userId", "==", user.uid));
             const unsubscribe = onSnapshot(q, (querySnapshot) => {
                 const transactionsData = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-                transactionsData.sort((a, b) => new Date(b.date) - new Date(a.date));
+                transactionsData.sort((a, b) => new Date(b.date) - new Date(b.date));
                 setTransactions(transactionsData);
             });
             return () => unsubscribe();
@@ -239,6 +262,15 @@ export default function App() {
     }, [transactions]);
     
     // --- Render Logic ---
+    if (showIntro) {
+        return (
+            <div className="intro-screen">
+                <img src="/logo.svg" alt="Rooted Logo" className="intro-logo" />
+                <h1 className="intro-text">Rooted</h1>
+            </div>
+        );
+    }
+
     if (loading || (user && !userProfile)) {
         return <div className="loading-screen"><h1>Loading Rooted...</h1></div>;
     }
@@ -310,4 +342,3 @@ export default function App() {
         </div>
     );
 }
-
