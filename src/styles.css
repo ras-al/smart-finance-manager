@@ -211,7 +211,8 @@ transition: color 0.2s;
 color: #ccffee; /* Even lighter teal on hover */
 }
 
-/* --- App Layout (Desktop) --- */
+
+/* --- App Layout --- */
 .app-container { display: flex; flex-direction: column; height: 100vh; }
 .main-content { flex: 1; padding: 30px; overflow-y: auto; position: relative; }
 
@@ -464,45 +465,30 @@ padding: 0 10px;
 }
 
 @media (max-width: 768px) {
-.app-container { flex-direction: column-reverse; }
-.main-content { padding: 15px; }
-.sidebar {
-order: 2;
-position: fixed;
-bottom: 0;
-left: 0;
-width: 100%;
-height: auto;
-border-top: 1px solid var(--border-color);
-border-bottom: none;
-background: var(--card-background);
-justify-content: space-around;
-padding: 10px 5px;
-box-shadow: 0 -4px 12px rgba(0,0,0,0.08);
-z-index: 100;
-}
-.sidebar-header, .user-profile, .logout-btn { display: none; }
-.theme-toggle {
-display: flex;
-position: fixed;
-top: 10px;
-right: 10px;
-width: 36px;
-height: 36px;
-font-size: 1.2rem;
-z-index: 101;
-}
-.sidebar-nav { width: 100%; justify-content: space-around; }
-.sidebar-nav button { flex-grow: 1; text-align: center; font-size: 14px; padding: 8px 5px; }
-.content-grid { grid-template-columns: 1fr; }
-.fab { bottom: 80px; right: 15px; }
-.chatbot-container { bottom: 15px; right: 15px; }
-.chatbot-window { width: calc(100vw - 30px); height: 70vh; bottom: 80px;}
-.chatbot-toggle-btn {
-display: flex;
-}
-/* Make FAB the chatbot opener on mobile */
-.fab.chat-active {
-background: var(--danger-color);
-}
+    .app-container { flex-direction: column-reverse; }
+    .main-content { padding: 15px; }
+    .sidebar { order: 2; }
+    .sidebar-header, .user-profile, .logout-btn { display: none; }
+    .theme-toggle { 
+        display: flex; 
+        position: absolute; 
+        top: 10px; 
+        right: 10px; 
+        width: 36px; 
+        height: 36px; 
+        font-size: 1.2rem; 
+    }
+    .sidebar-nav { width: 100%; justify-content: space-around; }
+    .sidebar-nav button { flex-grow: 1; text-align: center; font-size: 14px; padding: 8px 10px; }
+    .content-grid { grid-template-columns: 1fr; }
+    .fab { bottom: 80px; right: 15px; }
+    .chatbot-container { bottom: 15px; right: 15px; }
+    .chatbot-window { width: calc(100vw - 30px); height: 70vh; bottom: 80px;}
+    .chatbot-toggle-btn {
+        display: flex;
+    }
+    /* Make FAB the chatbot opener on mobile */
+    .fab.chat-active {
+        background: var(--danger-color);
+    }
 }
