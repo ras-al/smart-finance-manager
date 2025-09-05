@@ -1,3 +1,7 @@
+<p align="center">
+<img src="public/logo.png" alt="Rooted Logo" width="150">
+</p>
+
 # Rooted - AI-Powered Finance Manager
 <a href="https://rooted-financial.vercel.app">Click Here for Live View</a>
 
